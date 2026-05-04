@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login | Baker & Co.</title>
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+
+        <div class="auth-container">
+            <div class="logo" style="font-size: 2.5rem; margin-bottom: 20px;">BAKER & CO.</div>
+            <h2>Iniciar Sesión</h2>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 30px;">Bienvenido de nuevo a nuestra pastelería</p>
+
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="pass" placeholder="Contraseña" required>
+
+                <button type="submit" class="btn-black" style="margin-top: 20px;">ENTRAR</button>
+            </form>
+
+            <p style="margin-top: 30px; font-size: 0.8rem;">
+                ¿No tienes cuenta? <a href="registro.html" style="color: var(--gold); text-decoration: none; font-weight: 600;">Regístrate aquí</a>
+            </p>
+        </div>
+
+        <script>
+            document.getElementById('loginForm').onsubmit = async (e) => {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('pass').value;
+
+                try {
+                    // Llamamos a la ruta real que pusimos en server.js
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({email, password})
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        // GUARDAMOS EL USUARIO REAL (Nombre, email, etc.)
+                        // Esto hará que en el index.html aparezca tu nombre real
+                        localStorage.setItem('user', JSON.stringify(result.user));
+
+                        window.location.href = 'index.html';
+                    } else {
+                        // Mostramos el mensaje de error que configuramos en el servidor
+                        alert(result.message);
+                    }
+                } catch (err) {
+                    alert("Error: No se pudo conectar con el servidor.");
+                }
+            };
+        </script>
+    </body>
+</html>

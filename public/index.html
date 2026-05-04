@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Home | Baker & Co.</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">BAKER & CO.</div>
+        <nav>
+            <span id="user-name"></span>
+            <a href="checkout.html">CARRITO</a>
+            <button onclick="logout()" style="background:none; border:none; cursor:pointer;">SALIR</button>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Repostería con Alma</h1>
+        <p>Artesanos desde 1920</p>
+    </section>
+
+    <main class="container">
+        <div class="product-grid" id="lista-productos">
+            </div>
+    </main>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = 'login.html';
+        document.getElementById('user-name').innerText = `Hola, ${user.nombre}`;
+
+        async function cargarProductos() {
+            const res = await fetch('/api/productos');
+            const result = await res.json();
+            const container = document.getElementById('lista-productos');
+
+            if (result.status === 'success') {
+                result.data.forEach(p => {
+                    container.innerHTML += `
+                        <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
+                            <img src="img/${p.imagen_url || 'default.jpg'}" alt="${p.nombre}">
+                            <div class="product-info">
+                                <h3>${p.nombre}</h3>
+                                <p class="price">${p.precio_base}€</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+        
+        cargarProductos();
+    </script>
+</body>
+</html>

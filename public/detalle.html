@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Producto | Baker & Co.</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <style>
+            .detail-container {
+                max-width: 1000px;
+                margin: 80px auto;
+                background: white;
+                padding: 40px;
+                display: flex;
+                gap: 50px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            }
+            .product-image { width: 50%; object-fit: cover; }
+            .product-info { width: 50%; }
+            .price { color: var(--gold); font-size: 2rem; margin: 20px 0; }
+            label { font-size: 0.7rem; letter-spacing: 1px; color: #888; text-transform: uppercase; }
+            input, textarea { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid var(--border-light); }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">BAKER & CO.</div>
+        </header>
+
+        <div class="detail-container" id="detalle-producto">
+            </div>
+
+        <script>
+            // 1. Obtener el ID de la URL (ej: detalle.html?id=1)
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('id');
+
+            async function cargarDetalle() {
+                if (!productId) {
+                    document.getElementById('detalle-producto').innerHTML = "<h2>Producto no encontrado</h2>";
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`/api/productos/${productId}`);
+                    const result = await res.json();
+                    
+                    // El error solía estar aquí, verificamos si 'data' existe
+                    if (result.status === 'success' && result.data) {
+                        const p = result.data;
+                        document.getElementById('detalle-producto').innerHTML = `
+                            <img src="img/${p.imagen_url || 'default.jpg'}" class="product-image">
+                            <div class="product-info">
+                                <label>${p.nombre_categoria || 'Categoría'}</label>
+                                <h1 id="prod-name">${p.nombre}</h1>
+                                <p class="price" id="prod-price">${p.precio_base}€</p>
+                                
+                                <div style="margin:20px 0;">
+                                    <label>Fecha de recogida:</label>
+                                    <input type="datetime-local" id="fecha-recogida">
+                                    
+                                    <label>Dedicatoria personalizada:</label>
+                                    <textarea id="mensaje-pastel" placeholder="Escribe aquí tu mensaje..."></textarea>
+                                </div>
+
+                                <button onclick="comprar()" class="btn-black">AÑADIR AL CARRITO</button>
+                                <p style="margin-top:20px;"><a href="index.html" style="color:black; font-size:0.8rem;">← VOLVER AL CATÁLOGO</a></p>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('detalle-producto').innerHTML = "<h2>Error al cargar el producto</h2>";
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+
+            function comprar() {
+                const pedido = {
+                    id: productId,
+                    nombre: document.getElementById('prod-name').innerText,
+                    precio: document.getElementById('prod-price').innerText.replace('€', ''),
+                    fecha: document.getElementById('fecha-recogida').value,
+                    mensaje: document.getElementById('mensaje-pastel').value
+                };
+                
+                if (!pedido.fecha) {
+                    alert("Por favor, selecciona una fecha de recogida.");
+                    return;
+                }
+
+                localStorage.setItem('carrito', JSON.stringify(pedido));
+                window.location.href = 'checkout.html';
+            }
+
+            cargarDetalle();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Finalizar Pedido | Baker & Co.</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+        <style>
+            .step-hidden {
+                display: none;
+            }
+            .form-control {
+                width: 100%;
+                padding: 12px;
+                margin: 8px 0;
+                border: 1px solid #ddd;
+                box-sizing: border-box;
+                font-family: 'Montserrat', sans-serif;
+            }
+            .active-step {
+                color: black !important;
+                font-weight: bold;
+                border-bottom: 2px solid #c5a059;
+            }
+            .summary-item {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+                align-items: center;
+            }
+            .summary-item img {
+                width: 70px;
+                height: 70px;
+                object-fit: cover;
+                border-radius: 4px;
+            }
+            .btn-black:disabled {
+                background: #666;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container" style="max-width: 1100px; margin: auto; padding: 50px 20px;">
+            <div class="logo" style="text-align: center; margin-bottom: 40px; font-size: 2rem;">BAKER & CO.</div>
+
+            <div class="step-indicator" style="display: flex; gap: 40px; justify-content: center; margin-bottom: 50px; color: #bbb; font-size: 0.85rem; letter-spacing: 1px;">
+                <span id="ind-1" class="active-step">01 MI PEDIDO</span>
+                <span id="ind-2">02 ENVÍO</span>
+                <span id="ind-3">03 PAGO</span>
+            </div>
+
+            <div class="checkout-layout" style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 60px;">
+
+                <div id="steps-container">
+
+                    <div id="step-1">
+                        <h3 style="margin-bottom: 25px;">Revisa tu pedido</h3>
+                        <div id="checkout-list"></div>
+                        <button class="btn-black" onclick="changeStep(2)" style="margin-top: 30px;">CONTINUAR AL ENVÍO</button>
+                        <a href="index.html" style="display: block; margin-top: 15px; font-size: 0.8rem; color: #888;">Seguir comprando</a>
+                    </div>
+
+                    <div id="step-2" class="step-hidden">
+                        <h3 style="margin-bottom: 25px;">Dirección de envío</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <input type="text" id="nombre-envio" placeholder="Nombre" class="form-control">
+                            <input type="text" id="apellidos-envio" placeholder="Apellidos" class="form-control">
+                            <input type="text" id="direccion" placeholder="Calle, número, piso y puerta" class="form-control" style="grid-column: span 2;">
+                            <input type="text" id="cp" placeholder="Código Postal (5 dígitos)" class="form-control" maxlength="5">
+                            <input type="text" id="ciudad" placeholder="Ciudad" class="form-control">
+                        </div>
+                        <button class="btn-black" onclick="changeStep(3)" style="margin-top: 30px;">CONTINUAR AL PAGO</button>
+                        <p onclick="changeStep(1)" style="cursor:pointer; text-decoration: underline; font-size: 0.8rem; margin-top: 20px; color: #888;">Volver al carrito</p>
+                    </div>
+
+                    <div id="step-3" class="step-hidden">
+                        <h3 style="margin-bottom: 25px;">Método de Pago</h3>
+                        <div style="border: 1px solid #000; padding: 25px; margin-bottom: 20px; background: #fff;">
+                            <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 10px;">TARJETA DE CRÉDITO</label>
+                            <input type="text" id="tarjeta-num" placeholder="0000 0000 0000 0000" class="form-control" maxlength="19">
+                            <div style="display: flex; gap: 15px;">
+                                <input type="text" id="tarjeta-exp" placeholder="MM/AA" class="form-control" maxlength="5">
+                                <input type="text" id="tarjeta-cvv" placeholder="CVV" class="form-control" maxlength="3">
+                            </div>
+                        </div>
+                        <button class="btn-black" onclick="finalizarCompra()">PAGAR AHORA</button>
+                        <p onclick="changeStep(2)" style="cursor:pointer; text-decoration: underline; font-size: 0.8rem; margin-top: 20px; color: #888;">Volver a envío</p>
+                    </div>
+                </div>
+
+                <aside class="summary-card" style="background: #fff; padding: 35px; border: 1px solid #f0f0f0; height: fit-content;">
+                    <h4 style="margin-top: 0; letter-spacing: 1px;">RESUMEN</h4>
+                    <div id="side-summary"></div>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem;">
+                        <span>TOTAL</span>
+                        <span id="total-price">0.00€</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <script>
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+            function renderCheckout() {
+                const list = document.getElementById('checkout-list');
+                const side = document.getElementById('side-summary');
+                const totalPriceElement = document.getElementById('total-price');
+
+                if (!carrito || (Array.isArray(carrito) && carrito.length === 0)) {
+                    list.innerHTML = "<p>Tu carrito está vacío.</p>";
+                    side.innerHTML = "<p>No hay productos.</p>";
+                    return;
+                }
+
+                // Manejamos si el carrito es un objeto único o un array
+                const item = Array.isArray(carrito) ? carrito[0] : carrito;
+
+                const html = `
+                    <div class="summary-item">
+                        <img src="${item.imagen_url || 'img/cake-default.jpg'}" alt="${item.nombre}">
+                        <div style="flex: 1;">
+                            <p style="margin: 0; font-weight: 600;">${item.nombre}</p>
+                            <p style="margin: 5px 0 0; font-size: 0.75rem; color: #888;">Recogida: ${item.fecha || 'No indicada'}</p>
+                            <p style="margin: 2px 0 0; font-size: 0.75rem; color: #888;">Dedicatoria: "${item.mensaje || 'Sin mensaje'}"</p>
+                        </div>
+                        <div style="font-weight: 600;">${item.precio}€</div>
+                    </div>
+                `;
+
+                list.innerHTML = html;
+                side.innerHTML = html;
+                totalPriceElement.innerText = item.precio + "€";
+            }
+
+            function changeStep(step) {
+                // VALIDACIÓN PASO 1 -> 2 (Carrito vacío)
+                if (step === 2) {
+                    if (!carrito || (Array.isArray(carrito) && carrito.length === 0)) {
+                        alert("El carrito está vacío. Añade un producto para continuar.");
+                        return;
+                    }
+                }
+
+                // VALIDACIÓN PASO 2 -> 3 (Datos de envío)
+                if (step === 3) {
+                    const campos = [
+                        {id: 'nombre-envio', msg: "Introduce tu nombre."},
+                        {id: 'apellidos-envio', msg: "Introduce tus apellidos."},
+                        {id: 'direccion', msg: "Introduce la dirección de entrega."},
+                        {id: 'cp', msg: "Introduce un Código Postal válido."},
+                        {id: 'ciudad', msg: "Introduce la ciudad."}
+                    ];
+
+                    for (let campo of campos) {
+                        const val = document.getElementById(campo.id).value.trim();
+                        if (!val) {
+                            alert(campo.msg);
+                            document.getElementById(campo.id).focus();
+                            return;
+                        }
+                    }
+
+                    const cpValue = document.getElementById('cp').value;
+                    if (isNaN(cpValue) || cpValue.length !== 5) {
+                        alert("⚠️ El Código Postal debe ser de 5 números.");
+                        return;
+                    }
+                }
+
+                // Cambio visual de pasos
+                document.querySelectorAll('#steps-container > div').forEach(div => div.classList.add('step-hidden'));
+                document.querySelectorAll('.step-indicator span').forEach(span => span.classList.remove('active-step'));
+
+                document.getElementById('step-' + step).classList.remove('step-hidden');
+                document.getElementById('ind-' + step).classList.add('active-step');
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+
+            async function finalizarCompra() {
+                // VALIDACIÓN PASO 3 (Datos de pago)
+                const tarjeta = document.getElementById('tarjeta-num').value.replace(/\s/g, '');
+                const exp = document.getElementById('tarjeta-exp').value;
+                const cvv = document.getElementById('tarjeta-cvv').value;
+
+                if (tarjeta.length < 16) {
+                    alert("Introduce un número de tarjeta válido (16 dígitos).");
+                    return;
+                }
+                if (!exp.includes('/') || exp.length < 5) {
+                    alert("Formato de caducidad incorrecto (MM/AA).");
+                    return;
+                }
+                if (cvv.length < 3) {
+                    alert("Código CVV incompleto.");
+                    return;
+                }
+
+                const btn = document.querySelector('#step-3 .btn-black');
+                btn.innerText = "PROCESANDO PAGO...";
+                btn.disabled = true;
+
+                // Simulación de delay de red para realismo
+                setTimeout(() => {
+                    localStorage.removeItem('carrito');
+                    window.location.href = 'confirmacion.html';
+                }, 2000);
+            }
+
+            renderCheckout();
+        </script>
+    </body>
+</html>
