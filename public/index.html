@@ -1,43 +1,84 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Home | Baker & Co.</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <header>
-        <div class="logo">BAKER & CO.</div>
-        <nav>
-            <span id="user-name"></span>
-            <a href="checkout.html">CARRITO</a>
-            <button onclick="logout()" style="background:none; border:none; cursor:pointer;">SALIR</button>
-        </nav>
-    </header>
-
-    <section class="hero">
-        <h1>Repostería con Alma</h1>
-        <p>Artesanos desde 1920</p>
-    </section>
-
-    <main class="container">
-        <div class="product-grid" id="lista-productos">
+    <head>
+        <meta charset="UTF-8">
+        <title>Home | Baker & Co.</title>
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+        <header>
+            <div class="logo">BAKER & CO.</div>
+            <nav>
+                <span id="user-name"></span>
+                <a href="checkout.html">CARRITO</a>
+                <button id="btn-logout" onclick="logout()" style="background:none; border:none; cursor:pointer;">SALIR</button>
+            </nav>
+            <div class="idiomas" style="margin-right: 20px;">
+                <button onclick="cambiarIdioma('es')" style="cursor:pointer">ES</button>
+                <button onclick="cambiarIdioma('en')" style="cursor:pointer">EN</button>
             </div>
-    </main>
+        </header>
 
-    <script>
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) window.location.href = 'login.html';
-        document.getElementById('user-name').innerText = `Hola, ${user.nombre}`;
+        <section class="hero">
+            <h1>Repostería con Alma</h1>
+            <p>Artesanos desde 1920</p>
+        </section>
 
-        async function cargarProductos() {
-            const res = await fetch('/api/productos');
-            const result = await res.json();
-            const container = document.getElementById('lista-productos');
+        <main class="container">
+            <div class="product-grid" id="lista-productos">
+            </div>
+        </main>
 
-            if (result.status === 'success') {
-                result.data.forEach(p => {
-                    container.innerHTML += `
+        <script>
+            // 1. GESTIÓN DE IDIOMA 
+            if (!localStorage.getItem('idioma')) {
+                localStorage.setItem('idioma', 'es');
+            }
+
+            function cambiarIdioma(lang) {
+                localStorage.setItem('idioma', lang);
+                location.reload(); // Recarga para que se apliquen los textos
+            }
+
+            // Diccionario de textos (solo he añadido dos pero se puede ampliar)
+            const traducciones = {
+                'es': {'bienvenida': 'Repostería con Alma', 'subtitulo': 'Artesanos desde 1920', 'btn-logout': 'SALIR'},
+                'en': {'bienvenida': 'Pastry with Soul', 'subtitulo': 'Artisans since 1920', 'btn-logout': 'LOGOUT'}
+            };
+
+            // 2. APLICAR TRADUCCIONES AL CARGAR
+            document.addEventListener('DOMContentLoaded', () => {
+                const lang = localStorage.getItem('idioma');
+                const t = traducciones[lang];
+
+                // Cambiamos los textos de la página
+                if (document.querySelector('.hero h1'))
+                    document.querySelector('.hero h1').innerText = t['bienvenida'];
+                if (document.querySelector('.hero p'))
+                    document.querySelector('.hero p').innerText = t['subtitulo'];
+                if (document.getElementById('btn-logout'))
+                    document.getElementById('btn-logout').innerText = t['btn-logout'];
+            });
+
+            // 3. LÓGICA DE USUARIO Y PRODUCTOS
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user)
+                window.location.href = 'login.html';
+
+            const userNameElement = document.getElementById('user-name');
+            if (userNameElement)
+                userNameElement.innerText = `Hola, ${user.nombre}`;
+
+            async function cargarProductos() {
+                try {
+                    const res = await fetch('/api/productos');
+                    const result = await res.json();
+                    const container = document.getElementById('lista-productos');
+
+                    if (result.status === 'success' && container) {
+                        container.innerHTML = ''; // Limpiar antes de cargar
+                        result.data.forEach(p => {
+                            container.innerHTML += `
                         <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
                             <img src="img/${p.imagen_url || 'default.jpg'}" alt="${p.nombre}">
                             <div class="product-info">
@@ -46,16 +87,19 @@
                             </div>
                         </div>
                     `;
-                });
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error cargando productos:", error);
+                }
             }
-        }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-        
-        cargarProductos();
-    </script>
-</body>
+            function logout() {
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+
+            cargarProductos();
+        </script>
+    </body>
 </html>
