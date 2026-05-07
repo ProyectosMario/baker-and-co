@@ -115,4 +115,33 @@ Para iniciar el servidor, ejecute el siguiente comando en la terminal:
 
 Debería ver el mensaje: ? Baker & Co Enterprise listo en http://localhost:3000.
 
-  
+
+### 📁 Estructura del Proyecto
+
+```text
+BakerCoEnterprise/
+├── config/               # Configuración conexión DB
+├── controllers/          # Lógica de control (MVC)
+│   ├── authController.js
+│   ├── ingredientController.js
+│   └── productController.js
+├── middlewares/          # Funciones intermedias (seguridad)
+├── node_modules/         # (Ignorado en Git) Librerías Node.js
+├── public/               # Frontend (Archivos estáticos)
+│   ├── css/              # Estilos CSS
+│   ├── images/           # Imágenes de productos
+│   ├── checkout.html
+│   ├── confirmacion.html
+│   ├── detalle.html
+│   ├── index.html
+│   ├── login.html
+│   ├── registro.html
+│   └── stock.html
+├── routes/               # Rutas de la API
+│   ├── authRoutes.js
+│   ├── ingredientRoutes.js
+│   └── productRoutes.js
+├── .env                  # (Ignorado en Git) Variables de entorno
+├── package-lock.json
+├── package.json          # Dependencias y scripts
+└── server.js             # Punto de entrada del servidor
