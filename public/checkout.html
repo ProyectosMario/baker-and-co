@@ -120,7 +120,7 @@
 
                 const html = `
                     <div class="summary-item">
-                        <img src="${item.imagen_url || 'img/cake-default.jpg'}" alt="${item.nombre}">
+                        <img src="${item.imagen_url}" alt="${item.nombre}" onerror="this.src='/images/tarta_queso.png'">
                         <div style="flex: 1;">
                             <p style="margin: 0; font-weight: 600;">${item.nombre}</p>
                             <p style="margin: 5px 0 0; font-size: 0.75rem; color: #888;">Recogida: ${item.fecha || 'No indicada'}</p>
