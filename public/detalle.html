@@ -48,7 +48,7 @@
                     if (result.status === 'success' && result.data) {
                         const p = result.data;
                         document.getElementById('detalle-producto').innerHTML = `
-                            <img src="img/${p.imagen_url || 'default.jpg'}" class="product-image">
+                            <img src="${p.imagen_url}" class="product-image" onerror="this.src='/images/tarta_queso.png'">
                             <div class="product-info">
                                 <label>${p.nombre_categoria || 'Categoría'}</label>
                                 <h1 id="prod-name">${p.nombre}</h1>
@@ -75,6 +75,7 @@
             }
 
             function comprar() {
+                const imgUrl = document.querySelector('.product-image').src;
                 const pedido = {
                     id: productId,
                     nombre: document.getElementById('prod-name').innerText,
