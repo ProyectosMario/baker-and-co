@@ -80,7 +80,7 @@
                         result.data.forEach(p => {
                             container.innerHTML += `
                         <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
-                            <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.src='images/default.jpg'">
+                            <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.src='/images/default.jpg'">
                             <div class="product-info">
                                 <h3>${p.nombre}</h3>
                                 <p class="price">${p.precio_base}€</p>
