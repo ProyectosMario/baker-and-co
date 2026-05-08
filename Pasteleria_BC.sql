@@ -113,7 +113,7 @@ INSERT INTO usuarios (nombre_completo, identificador_acceso, password_hash, anio
 VALUES (
     'Administrador de Pruebas', 
     'admin@baker.com', 
-    '$2a$12$S8vP7m68W7S.QoR67A/Sbu099.fNIsb6.LqA7fI7zB9GZ5xS7vW3C', -- Hash de 12345678
+    '$2b$10$HpX36F6OaxUpKEuFyGsR6.5d4ROqZMy5xVHRiDarQ.UXeKfKDL69i', -- Hash de 12345678
     1995, 
     'admin', 
     'activo'
