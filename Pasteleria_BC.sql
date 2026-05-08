@@ -97,10 +97,10 @@ INSERT INTO categorias (nombre, slug) VALUES
 ('Pastelería Fina', 'pasteleria-fina'), 
 ('Especialidades', 'especialidades');
 
-INSERT INTO productos (nombre, precio_base, id_categoria, imagen_url) VALUES 
-('Tarta de Queso Artesanal', 25.00, 1, 'tarta-queso.jpg'),
-('Pack 6 Cupcakes Gourmet', 18.50, 2, 'cupcakes.jpg'),
-('Tarta Red Velvet', 30.00, 1, 'red-velvet.jpg');
+INSERT INTO productos (nombre, descripcion_corta, precio_base, stock_disponible, imagen_url) VALUES 
+('Tarta de Queso', 'Deliciosa tarta cremosa con base de galleta.', 25.50, 20, '/images/tarta_queso.png'),
+('Cupcakes Pack', 'Caja de 6 cupcakes variados de sabores gourmet.', 15.00, 15, '/images/cupcakes.png'),
+('Red Velvet', 'Tarta clásica americana con glaseado de queso.', 30.00, 10, '/images/red_velvet.png');
 
 INSERT INTO ingredientes (nombre, stock_actual, unidad_medida) VALUES 
 ('Harina de Trigo', 50.00, 'kg'),
