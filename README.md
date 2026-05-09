@@ -81,7 +81,7 @@ Para ejecutar este proyecto, asegúrese de tener instaladas las siguientes herra
 **4. Importe el archivo SQL proporcionado (Pasteleria_BC.sql)**
 
    
-**5. En la carpeta raíz del proyecto, encontrará un archivo llamado .env. Asegúrese de que contenga**
+**5. En la carpeta raíz del proyecto, cree un archivo con extension .env. Asegúrese de que contenga**
 
 **las credenciales correctas para su conexión local:**
 DB_HOST=localhost
