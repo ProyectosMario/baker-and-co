@@ -49,8 +49,6 @@ El backend está desarrollado en **Node.js** con **Express** siguiendo el patró
 
 La aplicación utiliza un sistema de internacionalización (i18n). Para garantizar una carga inmediata y evitar bloqueos:
 
-- Se han configurado archivos JSON estáticos en la carpeta `public/locales/`.
-
 - El idioma por defecto es el **Español (ES)**, con opción de cambio a **Inglés (EN)** desde el menú principal.
 
 
