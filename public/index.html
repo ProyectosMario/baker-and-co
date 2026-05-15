@@ -64,7 +64,14 @@
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user)
                 window.location.href = 'login.html';
-
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            if (user && user.rol === 'admin') {
+            // Si es admin, creamos un botón para ir a la gestión de stock
+            const nav = document.querySelector('nav');
+            nav.innerHTML += `<a href="stock.html" style="color:var(--gold); margin-left:15px;">GESTIÓN STOCK</a>`;
+            }
+            
             const userNameElement = document.getElementById('user-name');
             if (userNameElement)
                 userNameElement.innerText = `Hola, ${user.nombre}`;
