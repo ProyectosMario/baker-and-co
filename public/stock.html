@@ -1,136 +1,142 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Inventario | Baker & Co.</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
-            padding: 40px 0;
-        }
-        .stock-card {
-            background: white;
-            padding: 25px;
-            border: 1px solid var(--border-light);
-            text-align: center;
-            transition: 0.3s;
-        }
-        .stock-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .stock-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            margin-bottom: 20px;
-        }
-        .stock-status {
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            display: block;
-            text-transform: uppercase;
-        }
-        .low-stock { color: #d9534f; font-weight: 600; }
-        .input-group {
-            margin: 20px 0;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-        .input-stock {
-            width: 70px;
-            padding: 8px;
-            text-align: center;
-            border: 1px solid var(--border-light);
-            font-family: 'Montserrat', sans-serif;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="logo">BAKER & CO.</div>
-        <nav>
-            <span style="font-size: 0.8rem; letter-spacing: 1px;">MODO ADMINISTRADOR</span>
-            <a href="index.html">IR A TIENDA</a>
-        </nav>
-    </header>
+    <head>
+        <meta charset="UTF-8">
+        <title>Gestión de Inventario | Baker & Co.</title>
+        <link rel="stylesheet" href="css/styles.css">
+        <style>
+            .admin-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 30px;
+                padding: 40px 0;
+            }
+            .stock-card {
+                background: white;
+                padding: 25px;
+                border: 1px solid var(--border-light);
+                text-align: center;
+                transition: 0.3s;
+            }
+            .stock-card:hover {
+                box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            }
+            .stock-card img {
+                width: 100%;
+                height: 180px;
+                object-fit: cover;
+                margin-bottom: 20px;
+            }
+            .stock-status {
+                font-size: 0.7rem;
+                letter-spacing: 2px;
+                margin-bottom: 15px;
+                display: block;
+                text-transform: uppercase;
+            }
+            .low-stock {
+                color: #d9534f;
+                font-weight: 600;
+            }
+            .input-group {
+                margin: 20px 0;
+                border-top: 1px solid #eee;
+                padding-top: 15px;
+            }
+            .input-stock {
+                width: 70px;
+                padding: 8px;
+                text-align: center;
+                border: 1px solid var(--border-light);
+                font-family: 'Montserrat', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo">BAKER & CO.</div>
+            <nav>
+                <span style="font-size: 0.8rem; letter-spacing: 1px;">MODO ADMINISTRADOR</span>
+                <a href="index.html">IR A TIENDA</a>
+            </nav>
+        </header>
 
-    <main class="container" style="max-width: 1200px; margin: auto; padding: 40px 20px;">
-        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;">Gestión de Stock</h2>
-        <p style="text-align: center; color: #888; margin-bottom: 40px;">Control de existencias</p>
-        
-        <div class="admin-grid" id="lista-stock">
+        <main class="container" style="max-width: 1200px; margin: auto; padding: 40px 20px;">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;">Gestión de Stock</h2>
+            <p style="text-align: center; color: #888; margin-bottom: 40px;">Control de existencias</p>
+
+            <div class="admin-grid" id="lista-stock">
             </div>
-    </main>
+        </main>
 
-    <script>
-        async function cargarStock() {
-            try {
-                const res = await fetch('/api/productos');
-                const result = await res.json();
-                const container = document.getElementById('lista-stock');
-                container.innerHTML = '';
+        <script>
+            async function cargarStock() {
+                try {
+                    const res = await fetch('/api/productos');
+                    const result = await res.json();
+                    const container = document.getElementById('lista-stock');
+                    container.innerHTML = '';
 
-                if (result.status === 'success') {
-                    result.data.forEach(p => {
-                        const isLow = p.stock_disponible < 10;
-                        container.innerHTML += `
-                            <div class="stock-card">
-                                <img src="img/${p.imagen_url || 'default.jpg'}" alt="${p.nombre}">
-                                <span class="stock-status ${isLow ? 'low-stock' : ''}">
-                                    ${isLow ? '● Stock Crítico' : '● Stock Disponible'}
-                                </span>
-                                <h3>${p.nombre}</h3>
-                                <p style="color: var(--gold); font-weight: 600;">${p.precio_base}€</p>
+                    if (result.status === 'success') {
+                        result.data.forEach(p => {
+                            const isLow = p.stock_disponible < 10;
+                            container.innerHTML += `
+                                <div class="stock-card">
+                                    <img src="images/${p.imagen_url || 'default.png'}" alt="${p.nombre}" onerror="this.src='images/default.png'">
+                                    <span class="stock-status ${isLow ? 'low-stock' : ''}">
+                                        ${isLow ? '● Stock Crítico' : '● Stock Disponible'}
+                                    </span>
+                                    <h3>${p.nombre}</h3>
+                                    <p style="color: var(--gold); font-weight: 600;">${p.precio_base}€</p>
                                 
-                                <div class="input-group">
-                                    <label style="display:block; font-size: 0.6rem; margin-bottom: 5px;">CANTIDAD EN ALMACÉN</label>
-                                    <input type="number" id="input-${p.id_producto}" value="${p.stock_disponible}" class="input-stock">
+                                    <div class="input-group">
+                                        <label style="display:block; font-size: 0.6rem; margin-bottom: 5px;">CANTIDAD EN ALMACÉN</label>
+                                        <input type="number" id="input-${p.id_producto}" value="${p.stock_disponible}" class="input-stock">
+                                    </div>
+                                
+                                    <button onclick="actualizar(${p.id_producto})" class="btn-black">
+                                        ACTUALIZAR
+                                    </button>
                                 </div>
-                                
-                                <button onclick="actualizar(${p.id_producto})" class="btn-black">
-                                    ACTUALIZAR
-                                </button>
-                            </div>
-                        `;
+                            `;
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error al cargar productos:", error);
+                }
+            }
+
+            async function actualizar(id) {
+                // 1. Capturamos el botón usando el evento actual
+                const btn = window.event.target;
+                const nuevoStock = document.getElementById(`input-${id}`).value;
+
+                try {
+                    const res = await fetch(`/api/productos/${id}/stock`, {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({nuevoStock: parseInt(nuevoStock)})
                     });
-                }
-            } catch (error) {
-                console.error("Error al cargar productos:", error);
-            }
-        }
 
-        async function actualizar(id) {
-            const nuevoStock = document.getElementById(`input-${id}`).value;
-            
-            try {
-                const res = await fetch(`/api/productos/${id}/stock`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nuevoStock: parseInt(nuevoStock) })
-                });
-                const result = await res.json();
-                
-                if(result.status === 'success') {
-                    // Feedback visual rápido
-                    const btn = event.target;
-                    const originalText = btn.innerText;
-                    btn.innerText = "¡GUARDADO!";
-                    btn.style.background = "#c5a059";
-                    
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.style.background = "black";
-                        cargarStock(); 
-                    }, 1500);
-                }
-            } catch (error) {
-                alert('No se pudo actualizar el stock');
-            }
-        }
+                    const result = await res.json();
 
-        cargarStock();
-    </script>
-</body>
+                    if (result.status === 'success') {
+                        const originalText = btn.innerText;
+                        btn.innerText = "¡GUARDADO!";
+                        btn.style.background = "#c5a059"; // Dorado Baker & Co.
+
+                        setTimeout(() => {
+                            btn.innerText = originalText;
+                            btn.style.background = "black";
+                            cargarStock();
+                        }, 1500);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('No se pudo actualizar el stock');
+                }
+            }
+            cargarStock();
+        </script>
+    </body>
 </html>
