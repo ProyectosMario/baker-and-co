@@ -7,7 +7,8 @@ Este proyecto es una aplicación Web Full-Stack para la gestión de inventario y
 - **URL de Producción (Hosting):** [https://baker-and-co.onrender.com]
 - **Base de Datos:** MySQL alojada en Aiven Cloud.
 
-- **Login de prueba:** Utilizar `admin@baker.com` con contraseña `12345678`.
+- **Login de prueba Usuario:** Utilizar `cliente@prueba.com` con contraseña `12345678`.
+- **Login de prueba Administrador:** Utilizar `admin@baker.com` con contraseña `12345678`.
 
 ## 📘 Guía de Uso de la Aplicación
 
