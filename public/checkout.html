@@ -125,9 +125,7 @@
                 return;
             }
             
-            // Lógica de validación de campos (omitida aquí para brevedad, pero mantenla igual)
-            // ... (Tus validaciones de Step 2 y Step 3) ...
-
+            //Validaciones
             document.querySelectorAll('#steps-container > div').forEach(div => div.classList.add('step-hidden'));
             document.querySelectorAll('.step-indicator span').forEach(span => span.classList.remove('active-step'));
             document.getElementById('step-' + step).classList.remove('step-hidden');
@@ -135,7 +133,7 @@
         }
 
         async function finalizarCompra() {
-            // Tus validaciones de tarjeta...
+            // Validaciones de tarjeta
             const btn = document.querySelector('#step-3 .btn-black');
             btn.innerText = "PROCESANDO PAGO...";
             btn.disabled = true;
