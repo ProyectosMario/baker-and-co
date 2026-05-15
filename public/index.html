@@ -50,65 +50,70 @@
                 const lang = localStorage.getItem('idioma');
                 const t = traducciones[lang];
 
-            // Aplicar textos
-            if (document.querySelector('.hero h1')) document.querySelector('.hero h1').innerText = t['bienvenida'];
-            if (document.querySelector('.hero p')) document.querySelector('.hero p').innerText = t['subtitulo'];
-            if (document.getElementById('btn-logout')) document.getElementById('btn-logout').innerText = t['btn-logout'];
+                // Aplicar textos
+                if (document.querySelector('.hero h1'))
+                    document.querySelector('.hero h1').innerText = t['bienvenida'];
+                if (document.querySelector('.hero p'))
+                    document.querySelector('.hero p').innerText = t['subtitulo'];
+                if (document.getElementById('btn-logout'))
+                    document.getElementById('btn-logout').innerText = t['btn-logout'];
 
-            // Lógica de usuario 
-            const user = JSON.parse(localStorage.getItem('user'));
-    
-            if (!user) {
-                window.location.href = 'login.html';
-                return; // Detenemos la ejecución si no hay usuario
-            }
+                // Lógica de usuario 
+                const user = JSON.parse(localStorage.getItem('user'));
 
-            // Mostrar nombre
-            const userNameElement = document.getElementById('user-name');
-            if (userNameElement) userNameElement.innerText = `Hola, ${user.nombre}`;
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return; // Detenemos la ejecución si no hay usuario
+                }
 
-            // Si es admin, añadimos el botón de Gestión de Stock
-            if (user.rol === 'admin') {
-                const nav = document.querySelector('nav');
-                // Usamos insertAdjacentHTML para no machacar los eventos del botón Logout
-                nav.insertAdjacentHTML('afterbegin', `<a href="stock.html" style="color:var(--gold); margin-right:15px; font-weight:bold;">GESTIÓN STOCK</a>`);
-            }
-    
-            // Cargar los productos una vez verificado el usuario
-            cargarProductos();
-        });
+                // Mostrar nombre
+                const userNameElement = document.getElementById('user-name');
+                if (userNameElement)
+                    userNameElement.innerText = `Hola, ${user.nombre}`;
+
+                // Si es admin, añadimos el botón de Gestión de Stock
+                if (user.rol === 'admin') {
+                    const nav = document.querySelector('nav');
+                    // Usamos insertAdjacentHTML para no machacar los eventos del botón Logout
+                    nav.insertAdjacentHTML('afterbegin', `<a href="stock.html" style="color:var(--gold); margin-right:15px; font-weight:bold;">GESTIÓN STOCK</a>`);
+                }
+
+                // Cargar los productos una vez verificado el usuario
+                cargarProductos();
+            });
 
             // 3. FUNCIONES ASÍNCRONAS
             async function cargarProductos() {
-            try {
-                const res = await fetch('/api/productos');
-                const result = await res.json();
-                const container = document.getElementById('lista-productos');
+                try {
+                    const res = await fetch('/api/productos');
+                    const result = await res.json();
+                    const container = document.getElementById('lista-productos');
 
-                if (result.status === 'success' && container) {
-                    container.innerHTML = ''; 
-                    result.data.forEach(p => {
-                        container.innerHTML += `
-                            <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
-                                <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.src='/images/default.jpg'">
-                                <div class="product-info">
-                                    <h3>${p.nombre}</h3>
-                                    <p class="price">${p.precio_base}€</p>
-                                </div>
-                            </div>
-                        `;
-                    });
+                    if (result.status === 'success' && container) {
+                        container.innerHTML = '';
+                        result.data.forEach(p => {
+                            if (p.stock_disponible > 0) {
+                                container.innerHTML += `
+                                <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
+                                    <img src="images/${p.imagen_url}" alt="${p.nombre}" onerror="this.src='images/default.png'">
+                                    <div class="product-info">
+                                        <h3>${p.nombre}</h3>
+                                        <p class="price">${p.precio_base}€</p>
+                                     </div>
+                                 </div>`;
+                                }
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error cargando productos:", error);
                 }
-            } catch (error) {
-                console.error("Error cargando productos:", error);
             }
-        }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-         </script>
+            function logout() {
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+        </script>
     </body>
 </html>
 
