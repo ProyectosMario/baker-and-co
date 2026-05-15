@@ -37,76 +37,79 @@
 
             function cambiarIdioma(lang) {
                 localStorage.setItem('idioma', lang);
-                location.reload(); // Recarga para que se apliquen los textos
+                location.reload();
             }
 
-            // Diccionario de textos (solo he añadido dos pero se puede ampliar)
             const traducciones = {
                 'es': {'bienvenida': 'Repostería con Alma', 'subtitulo': 'Artesanos desde 1920', 'btn-logout': 'SALIR'},
                 'en': {'bienvenida': 'Pastry with Soul', 'subtitulo': 'Artisans since 1920', 'btn-logout': 'LOGOUT'}
             };
 
-            // 2. APLICAR TRADUCCIONES AL CARGAR
+            // 2. APLICAR TRADUCCIONES Y LÓGICA DE NAVEGACIÓN AL CARGAR
             document.addEventListener('DOMContentLoaded', () => {
                 const lang = localStorage.getItem('idioma');
                 const t = traducciones[lang];
 
-                // Cambiamos los textos de la página
-                if (document.querySelector('.hero h1'))
-                    document.querySelector('.hero h1').innerText = t['bienvenida'];
-                if (document.querySelector('.hero p'))
-                    document.querySelector('.hero p').innerText = t['subtitulo'];
-                if (document.getElementById('btn-logout'))
-                    document.getElementById('btn-logout').innerText = t['btn-logout'];
-            });
+            // Aplicar textos
+            if (document.querySelector('.hero h1')) document.querySelector('.hero h1').innerText = t['bienvenida'];
+            if (document.querySelector('.hero p')) document.querySelector('.hero p').innerText = t['subtitulo'];
+            if (document.getElementById('btn-logout')) document.getElementById('btn-logout').innerText = t['btn-logout'];
 
-            // 3. LÓGICA DE USUARIO Y PRODUCTOS
+            // Lógica de usuario 
             const user = JSON.parse(localStorage.getItem('user'));
-            if (!user)
+    
+            if (!user) {
                 window.location.href = 'login.html';
-            const user = JSON.parse(localStorage.getItem('user'));
-            
-            if (user && user.rol === 'admin') {
-            // Si es admin, creamos un botón para ir a la gestión de stock
-            const nav = document.querySelector('nav');
-            nav.innerHTML += `<a href="stock.html" style="color:var(--gold); margin-left:15px;">GESTIÓN STOCK</a>`;
+                return; // Detenemos la ejecución si no hay usuario
             }
-            
+
+            // Mostrar nombre
             const userNameElement = document.getElementById('user-name');
-            if (userNameElement)
-                userNameElement.innerText = `Hola, ${user.nombre}`;
+            if (userNameElement) userNameElement.innerText = `Hola, ${user.nombre}`;
 
-            async function cargarProductos() {
-                try {
-                    const res = await fetch('/api/productos');
-                    const result = await res.json();
-                    const container = document.getElementById('lista-productos');
-
-                    if (result.status === 'success' && container) {
-                        container.innerHTML = ''; // Limpiar antes de cargar
-                        result.data.forEach(p => {
-                            container.innerHTML += `
-                        <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
-                            <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.src='/images/default.jpg'">
-                            <div class="product-info">
-                                <h3>${p.nombre}</h3>
-                                <p class="price">${p.precio_base}€</p>
-                            </div>
-                        </div>
-                    `;
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error cargando productos:", error);
-                }
+            // Si es admin, añadimos el botón de Gestión de Stock
+            if (user.rol === 'admin') {
+                const nav = document.querySelector('nav');
+                // Usamos insertAdjacentHTML para no machacar los eventos del botón Logout
+                nav.insertAdjacentHTML('afterbegin', `<a href="stock.html" style="color:var(--gold); margin-right:15px; font-weight:bold;">GESTIÓN STOCK</a>`);
             }
-
-            function logout() {
-                localStorage.clear();
-                window.location.href = 'login.html';
-            }
-
+    
+            // Cargar los productos una vez verificado el usuario
             cargarProductos();
-        </script>
+        });
+
+            // 3. FUNCIONES ASÍNCRONAS
+            async function cargarProductos() {
+            try {
+                const res = await fetch('/api/productos');
+                const result = await res.json();
+                const container = document.getElementById('lista-productos');
+
+                if (result.status === 'success' && container) {
+                    container.innerHTML = ''; 
+                    result.data.forEach(p => {
+                        container.innerHTML += `
+                            <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
+                                <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.src='/images/default.jpg'">
+                                <div class="product-info">
+                                    <h3>${p.nombre}</h3>
+                                    <p class="price">${p.precio_base}€</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error("Error cargando productos:", error);
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+         </script>
     </body>
 </html>
+
+
