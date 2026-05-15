@@ -1,123 +1,118 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>Producto | Baker & Co.</title>
-        <link rel="stylesheet" href="css/styles.css">
-        <style>
-            .detail-container {
-                max-width: 1000px;
-                margin: 80px auto;
-                background: white;
-                padding: 40px;
-                display: flex;
-                gap: 50px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-            }
-            .product-image { 
-                width: 50%; 
-                height: 500px; 
-                object-fit: cover; 
-            }
-            .product-info-detail { width: 50%; }
-            .price { color: #c5a059; font-size: 2rem; margin: 20px 0; }
-            label { font-size: 0.7rem; letter-spacing: 1px; color: #888; text-transform: uppercase; }
-            input, textarea { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #e0e0e0; font-family: inherit; }
-            
-            .btn-black {
-                background: #000;
-                color: white;
-                border: none;
-                padding: 15px 30px;
-                width: 100%;
-                cursor: pointer;
-                letter-spacing: 1px;
-                font-weight: 600;
-                text-transform: uppercase;
-                transition: 0.3s;
-            }
-            .btn-black:hover { opacity: 0.8; }
-        </style>
-    </head>
-    <body>
-        <header>
-            <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">BAKER & CO.</div>
-        </header>
+<head>
+    <meta charset="UTF-8">
+    <title>Producto | Baker & Co.</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .detail-container {
+            max-width: 1000px;
+            margin: 80px auto;
+            background: white;
+            padding: 40px;
+            display: flex;
+            gap: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+        .product-image { 
+            width: 50%; 
+            height: 500px; 
+            object-fit: cover; 
+        }
+        .product-info-detail { width: 50%; }
+        .price { color: #c5a059; font-size: 2rem; margin: 20px 0; }
+        label { font-size: 0.7rem; letter-spacing: 1px; color: #888; text-transform: uppercase; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #e0e0e0; font-family: inherit; }
+        
+        .btn-black {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            width: 100%;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .btn-black:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">BAKER & CO.</div>
+    </header>
 
-        <div class="detail-container" id="detalle-producto">
-            </div>
+    <div class="detail-container" id="detalle-producto"></div>
 
-        <script>
-            const params = new URLSearchParams(window.location.search);
-            const productId = params.get('id');
-            let productoActual = null;
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get('id');
+        let productoActual = null;
 
-            async function cargarDetalle() {
-                if (!productId) return;
+        async function cargarDetalle() {
+            if (!productId) return;
 
-                try {
-                    const res = await fetch(`/api/productos/${productId}`);
-                    const result = await res.json();
+            try {
+                const res = await fetch(`/api/productos/${productId}`);
+                const result = await res.json();
+                
+                if (result.status === 'success' && result.data) {
+                    productoActual = result.data;
+                    const p = productoActual;
                     
-                    if (result.status === 'success' && result.data) {
-                        productoActual = result.data;
-                        const p = productoActual;
-                        
-                        const rutaImagen = p.imagen_url.startsWith('images/') ? p.imagen_url : `images/${p.imagen_url}`;
-
-                        document.getElementById('detalle-producto').innerHTML = `
-                            <img src="${rutaImagen}" class="product-image" onerror="this.src='images/default.png'">
-                            <div class="product-info-detail">
-                                <label>${p.nombre_categoria || 'Categoría'}</label>
-                                <h1 id="prod-name" style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-top: 0;">${p.nombre}</h1>
-                                <p class="price" id="prod-price">${p.precio_base}€</p>
+                    document.getElementById('detalle-producto').innerHTML = `
+                        <img src="${p.imagen_url}" class="product-image" onerror="this.src='images/default.png'">
+                        <div class="product-info-detail">
+                            <label>${p.nombre_categoria || 'Categoría'}</label>
+                            <h1 id="prod-name" style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-top: 0;">${p.nombre}</h1>
+                            <p class="price" id="prod-price">${p.precio_base}€</p>
+                            
+                            <div style="margin:20px 0;">
+                                <label>Fecha de recogida:</label>
+                                <input type="datetime-local" id="fecha-recogida">
                                 
-                                <div style="margin:20px 0;">
-                                    <label>Fecha de recogida:</label>
-                                    <input type="datetime-local" id="fecha-recogida">
-                                    
-                                    <label>Dedicatoria personalizada:</label>
-                                    <textarea id="mensaje-pastel" placeholder="Escribe aquí tu mensaje..."></textarea>
-                                </div>
-
-                                <button onclick="comprar()" class="btn-black">AÑADIR AL CARRITO</button>
-                                <p style="margin-top:20px;"><a href="index.html" style="color:black; font-size:0.8rem; text-decoration: none;">← VOLVER AL CATÁLOGO</a></p>
+                                <label>Dedicatoria personalizada:</label>
+                                <textarea id="mensaje-pastel" placeholder="Escribe aquí tu mensaje..."></textarea>
                             </div>
-                        `;
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
+
+                            <button onclick="comprar()" class="btn-black">AÑADIR AL CARRITO</button>
+                            <p style="margin-top:20px;"><a href="index.html" style="color:black; font-size:0.8rem; text-decoration: none;">← VOLVER AL CATÁLOGO</a></p>
+                        </div>
+                    `;
                 }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function comprar() {
+            const fecha = document.getElementById('fecha-recogida').value;
+            if (!fecha) {
+                alert("Por favor, selecciona una fecha de recogida.");
+                return;
             }
 
-            function comprar() {
-                const fecha = document.getElementById('fecha-recogida').value;
-                if (!fecha) {
-                    alert("Por favor, selecciona una fecha de recogida.");
-                    return;
-                }
+            const itemParaCarrito = {
+                id: productId,
+                nombre: productoActual.nombre,
+                precio: productoActual.precio_base,
+                imagen: productoActual.imagen_url, 
+                fecha: fecha,
+                mensaje: document.getElementById('mensaje-pastel').value
+            };
+            
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            if (!Array.isArray(carrito)) carrito = [];
 
-                // Creamos el objeto del pedido
-                const itemParaCarrito = {
-                    id: productId,
-                    nombre: productoActual.nombre,
-                    precio: productoActual.precio_base,
-                    imagen: productoActual.imagen_url.startsWith('images/') ? productoActual.imagen_url : `images/${productoActual.imagen_url}`,
-                    fecha: fecha,
-                    mensaje: document.getElementById('mensaje-pastel').value
-                };
-                
-                // Carrito, más de un producto
-                let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-                if (!Array.isArray(carrito)) carrito = [];
+            carrito.push(itemParaCarrito);
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            
+            window.location.href = 'checkout.html';
+        }
 
-                carrito.push(itemParaCarrito);
-                localStorage.setItem('carrito', JSON.stringify(carrito));
-                
-                window.location.href = 'checkout.html';
-            }
-
-            cargarDetalle();
-        </script>
-    </body>
+        cargarDetalle();
+    </script>
+</body>
 </html>
