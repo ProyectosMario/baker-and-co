@@ -95,7 +95,7 @@
                             if (p.stock_disponible > 0) {
                                 container.innerHTML += `
                                 <div class="product-card" onclick="window.location.href='detalle.html?id=${p.id_producto}'">
-                                    <img src="images/${p.imagen_url}" alt="${p.nombre}" onerror="this.src='images/default.png'">
+                                    <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.src='images/default.png'">
                                     <div class="product-info">
                                         <h3>${p.nombre}</h3>
                                         <p class="price">${p.precio_base}€</p>
