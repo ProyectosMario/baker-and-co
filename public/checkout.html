@@ -5,7 +5,6 @@
         <title>Producto | Baker & Co.</title>
         <link rel="stylesheet" href="css/styles.css">
         <style>
-            /* Restauramos exactamente tu CSS original */
             .detail-container {
                 max-width: 1000px;
                 margin: 80px auto;
@@ -17,7 +16,7 @@
             }
             .product-image { 
                 width: 50%; 
-                height: 500px; /* Altura fija que tenías en el CSS original */
+                height: 500px; 
                 object-fit: cover; 
             }
             .product-info-detail { width: 50%; }
@@ -25,7 +24,6 @@
             label { font-size: 0.7rem; letter-spacing: 1px; color: #888; text-transform: uppercase; }
             input, textarea { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #e0e0e0; font-family: inherit; }
             
-            /* Botón con tu estilo original */
             .btn-black {
                 background: #000;
                 color: white;
@@ -65,7 +63,6 @@
                         productoActual = result.data;
                         const p = productoActual;
                         
-                        // Corregimos la ruta de la imagen para que sea consistente
                         const rutaImagen = p.imagen_url.startsWith('images/') ? p.imagen_url : `images/${p.imagen_url}`;
 
                         document.getElementById('detalle-producto').innerHTML = `
@@ -100,7 +97,7 @@
                     return;
                 }
 
-                // Creamos el objeto del pedido con la ruta de imagen correcta
+                // Creamos el objeto del pedido
                 const itemParaCarrito = {
                     id: productId,
                     nombre: productoActual.nombre,
@@ -110,7 +107,7 @@
                     mensaje: document.getElementById('mensaje-pastel').value
                 };
                 
-                // Lógica de acumulación corregida
+                // Carrito, más de un producto
                 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
                 if (!Array.isArray(carrito)) carrito = [];
 
