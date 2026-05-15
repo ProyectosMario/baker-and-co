@@ -82,7 +82,7 @@
                             const isLow = p.stock_disponible < 10;
                             container.innerHTML += `
                                 <div class="stock-card">
-                                    <img src="images/${p.imagen_url || 'default.png'}" alt="${p.nombre}" onerror="this.src='images/default.png'">
+                                    <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.src='images/default.png'">
                                     <span class="stock-status ${isLow ? 'low-stock' : ''}">
                                         ${isLow ? '● Stock Crítico' : '● Stock Disponible'}
                                     </span>
