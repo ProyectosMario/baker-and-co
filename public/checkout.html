@@ -6,51 +6,13 @@
         <link rel="stylesheet" href="css/style.css">
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
         <style>
-            .step-hidden {
-                display: none;
-            }
-            .form-control {
-                width: 100%;
-                padding: 12px;
-                margin: 8px 0;
-                border: 1px solid #ddd;
-                box-sizing: border-box;
-                font-family: 'Montserrat', sans-serif;
-            }
-            .active-step {
-                color: black !important;
-                font-weight: bold;
-                border-bottom: 2px solid #c5a059;
-            }
-            .summary-item {
-                display: flex;
-                gap: 15px;
-                margin-bottom: 20px;
-                align-items: center;
-                border-bottom: 1px solid #f9f9f9;
-                padding-bottom: 10px;
-            }
-            .summary-item img {
-                width: 70px;
-                height: 70px;
-                object-fit: cover;
-                border-radius: 4px;
-            }
-            .btn-black:disabled {
-                background: #666;
-                cursor: not-allowed;
-            }
-            .btn-eliminar {
-                background: none;
-                border: none;
-                color: #d9534f;
-                cursor: pointer;
-                font-size: 0.7rem;
-                text-transform: uppercase;
-                padding: 0;
-                margin-top: 5px;
-                font-weight: 600;
-            }
+            .step-hidden { display: none; }
+            .form-control { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+            .active-step { color: black !important; font-weight: bold; border-bottom: 2px solid #c5a059; }
+            .summary-item { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; border-bottom: 1px solid #f9f9f9; padding-bottom: 10px; }
+            .summary-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; }
+            .btn-black:disabled { background: #666; cursor: not-allowed; }
+            .btn-eliminar { background: none; border: none; color: #d9534f; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; padding: 0; margin-top: 5px; font-weight: 600; }
         </style>
     </head>
     <body>
@@ -65,14 +27,12 @@
 
             <div class="checkout-layout" style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 60px;">
                 <div id="steps-container">
-
                     <div id="step-1">
                         <h3 style="margin-bottom: 25px;">Revisa tu pedido</h3>
                         <div id="checkout-list"></div>
                         <button class="btn-black" id="btn-continuar-envio" onclick="changeStep(2)" style="margin-top: 30px;">CONTINUAR AL ENVÍO</button>
                         <a href="index.html" style="display: block; margin-top: 15px; font-size: 0.8rem; color: #888; text-decoration: none;">Seguir comprando</a>
                     </div>
-
                     <div id="step-2" class="step-hidden">
                         <h3 style="margin-bottom: 25px;">Dirección de envío</h3>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -85,7 +45,6 @@
                         <button class="btn-black" onclick="changeStep(3)" style="margin-top: 30px;">CONTINUAR AL PAGO</button>
                         <p onclick="changeStep(1)" style="cursor:pointer; text-decoration: underline; font-size: 0.8rem; margin-top: 20px; color: #888;">Volver al carrito</p>
                     </div>
-
                     <div id="step-3" class="step-hidden">
                         <h3 style="margin-bottom: 25px;">Método de Pago</h3>
                         <div style="border: 1px solid #000; padding: 25px; margin-bottom: 20px; background: #fff;">
@@ -114,7 +73,6 @@
         </div>
 
         <script>
-            // Función principal para dibujar el carrito
             function renderCheckout() {
                 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
                 const list = document.getElementById('checkout-list');
@@ -122,23 +80,15 @@
                 const totalPriceElement = document.getElementById('total-price');
                 const btnContinuar = document.getElementById('btn-continuar-envio');
 
-                // Caso: Carrito vacío
                 if (carrito.length === 0) {
-                    list.innerHTML = `
-                        <div style="text-align:center; padding:40px; border: 1px dashed #ccc;">
-                            <p>Tu carrito está vacío.</p>
-                            <a href="index.html" style="color: black; font-weight: bold; text-decoration: underline;">Volver a la tienda</a>
-                        </div>`;
+                    list.innerHTML = `<div style="text-align:center; padding:40px; border: 1px dashed #ccc;"><p>Tu carrito está vacío.</p><a href="index.html" style="color: black; font-weight: bold; text-decoration: underline;">Volver a la tienda</a></div>`;
                     side.innerHTML = "<p style='font-size:0.8rem; color:#999;'>No hay productos en la cesta.</p>";
                     totalPriceElement.innerText = "0.00€";
-                    if (btnContinuar)
-                        btnContinuar.style.display = 'none';
+                    if (btnContinuar) btnContinuar.style.display = 'none';
                     return;
                 }
 
-                // Caso: Hay productos
-                if (btnContinuar)
-                    btnContinuar.style.display = 'block';
+                if (btnContinuar) btnContinuar.style.display = 'block';
 
                 let htmlContent = "";
                 let total = 0;
@@ -147,7 +97,7 @@
                     total += parseFloat(item.precio);
                     htmlContent += `
                         <div class="summary-item">
-                            <img src="${item.imagen}" onerror="this.src='images/default.png'">
+                            <img src="${item.imagen}" alt="${item.nombre}" onerror="this.src='images/default.png'">
                             <div style="flex: 1;">
                                 <p style="margin: 0; font-weight: 600;">${item.nombre}</p>
                                 <p style="margin: 5px 0 0; font-size: 0.75rem; color: #888;">Recogida: ${item.fecha || 'No indicada'}</p>
@@ -163,7 +113,6 @@
                 totalPriceElement.innerText = total.toFixed(2) + "€";
             }
 
-            // Eliminar producto individual
             function eliminarProducto(index) {
                 let carritoActual = JSON.parse(localStorage.getItem('carrito')) || [];
                 carritoActual.splice(index, 1);
@@ -171,17 +120,12 @@
                 renderCheckout();
             }
 
-            // Control de pasos del formulario
             function changeStep(step) {
                 const carritoCheck = JSON.parse(localStorage.getItem('carrito')) || [];
-
-                // Bloqueo si intenta avanzar sin productos
                 if (step === 2 && carritoCheck.length === 0) {
                     alert("Añade algún producto antes de continuar.");
                     return;
                 }
-
-                // Validación básica de campos en Paso 2
                 if (step === 3) {
                     const nombre = document.getElementById('nombre-envio').value.trim();
                     const cp = document.getElementById('cp').value.trim();
@@ -190,42 +134,34 @@
                         return;
                     }
                 }
-
                 document.querySelectorAll('#steps-container > div').forEach(div => div.classList.add('step-hidden'));
                 document.querySelectorAll('.step-indicator span').forEach(span => span.classList.remove('active-step'));
-
                 document.getElementById('step-' + step).classList.remove('step-hidden');
                 document.getElementById('ind-' + step).classList.add('active-step');
                 window.scrollTo({top: 0, behavior: 'smooth'});
             }
 
-            // Finalizar y validar compra
             async function finalizarCompra() {
                 let carritoFinal = JSON.parse(localStorage.getItem('carrito')) || [];
-
                 if (carritoFinal.length === 0) {
                     alert("⚠️ El carrito está vacío.");
                     window.location.href = 'index.html';
                     return;
                 }
-
                 const tarjeta = document.getElementById('tarjeta-num').value.trim();
                 if (tarjeta.length < 16) {
                     alert("⚠️ Por favor, introduce un número de tarjeta válido.");
                     return;
                 }
-
                 const btn = document.getElementById('btn-pagar');
                 btn.innerText = "PROCESANDO PAGO...";
                 btn.disabled = true;
-
                 setTimeout(() => {
                     localStorage.removeItem('carrito');
                     window.location.href = 'confirmacion.html';
                 }, 2000);
             }
 
-            // Iniciar al cargar
             document.addEventListener('DOMContentLoaded', renderCheckout);
         </script>
     </body>
