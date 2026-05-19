@@ -14,10 +14,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const ingredientRoutes = require('./routes/ingredientRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 app.use('/api/auth', authRoutes);         // Para Login y Registro
 app.use('/api/productos', productRoutes);    // Para ver los pasteles
 app.use('/api/ingredientes', ingredientRoutes); // Para el stock
+app.use('/api/pedidos', orderRoutes);      //Para los pedidos
 
 // Añado un manejo de errores que no tenía antes, algo básico pero funcional
 app.use((err, req, res, next) => {
