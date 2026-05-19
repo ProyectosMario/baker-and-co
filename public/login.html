@@ -25,7 +25,7 @@
             </p>
         </div>
 
-       <script>
+        <script>
             document.getElementById('loginForm').onsubmit = async (e) => {
                 e.preventDefault();
 
@@ -38,17 +38,20 @@
                     const response = await fetch('/api/auth/login', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            email: email, // Enviamos la variable email
-                            password: password  // Enviamos la variable password
-                        })
+                        body: JSON.stringify({email: email, password: password})
                     });
 
                     const result = await response.json();
 
                     if (result.status === 'success') {
                         localStorage.setItem('user', JSON.stringify(result.user));
-                        window.location.href = 'index.html';
+
+                        // Redirección inteligente según el rol que devuelve la BBDD
+                        if (result.user.rol === 'empleado' || result.user.rol === 'admin') {
+                            window.location.href = 'empleado.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
                     } else {
                         alert(result.message);
                     }
