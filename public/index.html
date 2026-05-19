@@ -7,7 +7,7 @@
     </head>
     <body>
         <header>
-            <div class="logo">BAKER & CO.</div>
+            <div class="logo" onclick="window.location.href = 'index.html'" style="cursor:pointer;">BAKER & CO.</div>
             <nav>
                 <span id="user-name"></span>
                 <a href="checkout.html">CARRITO</a>
@@ -63,19 +63,26 @@
 
                 if (!user) {
                     window.location.href = 'login.html';
-                    return; // Detenemos la ejecución si no hay usuario
+                    return;
                 }
-
-                // Mostrar nombre
+                
                 const userNameElement = document.getElementById('user-name');
                 if (userNameElement)
-                    userNameElement.innerText = `Hola, ${user.nombre}`;
+                    userNameElement.innerText = `Hola, ${user.nombre_completo}`;
 
-                // Si es admin, añadimos el botón de Gestión de Stock
+                // SI ES ADMIN: Añadimos dinámicamente los dos botones 
                 if (user.rol === 'admin') {
                     const nav = document.querySelector('nav');
-                    // Usamos insertAdjacentHTML para no machacar los eventos del botón Logout
-                    nav.insertAdjacentHTML('afterbegin', `<a href="stock.html" style="color:var(--gold); margin-right:15px; font-weight:bold;">GESTIÓN STOCK</a>`);
+
+                    // Botón 1: Redirige a la pantalla de gestión de empleados
+                    nav.insertAdjacentHTML('afterbegin', `
+                        <a href="empleado.html" style="color:var(--gold); margin-right:15px; font-weight:bold; text-decoration:none;">GESTIÓN OBRADOR</a>
+                    `);
+
+                    // Botón 2: Redirige al panel de control de stock de productos
+                    nav.insertAdjacentHTML('afterbegin', `
+                        <a href="stock.html" style="color:var(--gold); margin-right:15px; font-weight:bold; text-decoration:none;">GESTIÓN STOCK</a>
+                    `);
                 }
 
                 // Cargar los productos una vez verificado el usuario
@@ -101,7 +108,7 @@
                                         <p class="price">${p.precio_base}€</p>
                                      </div>
                                  </div>`;
-                                }
+                            }
                         });
                     }
                 } catch (error) {
