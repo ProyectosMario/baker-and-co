@@ -47,7 +47,7 @@
                         localStorage.setItem('user', JSON.stringify(result.user));
 
                         // Redirección inteligente según el rol que devuelve la BBDD
-                        if (result.user.rol === 'empleado' || result.user.rol === 'admin') {
+                        if (result.user.rol === 'empleado') {
                             window.location.href = 'empleado.html';
                         } else {
                             window.location.href = 'index.html';
