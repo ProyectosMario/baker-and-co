@@ -1,47 +1,106 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>¡Gracias por tu pedido! | Baker & Co.</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-</head>
-<body style="background: #fcfaf7;">
+    <head>
+        <meta charset="UTF-8">
+        <title>¡Gracias por tu pedido! | Baker & Co.</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    </head>
+    <body style="background: #fcfaf7;">
 
-    <div class="auth-container" style="max-width: 650px; margin: 100px auto; text-align: center; background: white; padding: 60px; box-shadow: 0 20px 40px rgba(0,0,0,0.03);">
-        <div style="font-size: 5rem; color: #c5a059; margin-bottom: 20px;">✔</div>
-        <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 10px;">¡Pedido Confirmado!</h1>
-        <p style="color: #888; margin-bottom: 40px;">Tu solicitud ha sido enviada al obrador. En breve recibirás un email con los detalles.</p>
-        
-        <div id="ticket" style="text-align: left; background: #fafafa; border: 1px solid #eee; padding: 30px; margin-bottom: 40px; position: relative;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <span style="font-weight: 600; letter-spacing: 1px;">BAKER & CO. ENTERPRISE</span>
-                <span id="fecha-hoy" style="font-size: 0.8rem; color: #999;"></span>
+        <div class="auth-container" style="max-width: 650px; margin: 100px auto; text-align: center; background: white; padding: 60px; box-shadow: 0 20px 40px rgba(0,0,0,0.03);">
+            <div style="font-size: 5rem; color: #c5a059; margin-bottom: 20px;">✔</div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 10px;">¡Pedido Confirmado!</h1>
+            <p style="color: #888; margin-bottom: 40px;">Tu solicitud ha sido enviada al obrador. En breve recibirás un email con los detalles.</p>
+
+            <div id="ticket" style="text-align: left; background: #fafafa; border: 1px solid #eee; padding: 30px; margin-bottom: 40px; position: relative;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <span style="font-weight: 600; letter-spacing: 1px;">BAKER & CO. ENTERPRISE</span>
+                    <span id="fecha-hoy" style="font-size: 0.8rem; color: #999;"></span>
+                </div>
+
+                <p style="margin: 5px 0;"><strong>Nº de Pedido:</strong> <span id="order-id"></span></p>
+                <p style="margin: 5px 0;"><strong>Estado:</strong> <span style="color: #c5a059;">En preparación</span></p>
+                <p style="margin: 5px 0;"><strong>Método:</strong> Recogida en tienda</p>
+
+                <div style="border-top: 1px dashed #ccc; margin: 20px 0; padding-top: 20px;">
+                    <p style="font-size: 0.8rem; color: #666; font-style: italic;">"Gracias por elegir la repostería artesanal de calidad."</p>
+                </div>
             </div>
-            
-            <p style="margin: 5px 0;"><strong>Nº de Pedido:</strong> <span id="order-id"></span></p>
-            <p style="margin: 5px 0;"><strong>Estado:</strong> <span style="color: #c5a059;">En preparación</span></p>
-            <p style="margin: 5px 0;"><strong>Método:</strong> Recogida en tienda</p>
-            
-            <div style="border-top: 1px dashed #ccc; margin: 20px 0; padding-top: 20px;">
-                <p style="font-size: 0.8rem; color: #666; font-style: italic;">"Gracias por elegir la repostería artesanal de calidad."</p>
-            </div>
+
+            <button onclick="window.location.href = 'index.html'" class="btn-black" style="margin-bottom: 15px;">VOLVER A LA TIENDA</button>
+            <br>
+            <button onclick="window.print()" style="background: none; border: 1px solid #ddd; padding: 12px 25px; cursor: pointer; font-family: inherit; font-size: 0.8rem; letter-spacing: 1px;">
+                DESCARGAR RECIBO (PDF)
+            </button>
         </div>
 
-        <button onclick="window.location.href='index.html'" class="btn-black" style="margin-bottom: 15px;">VOLVER A LA TIENDA</button>
-        <br>
-        <button onclick="window.print()" style="background: none; border: 1px solid #ddd; padding: 12px 25px; cursor: pointer; font-family: inherit; font-size: 0.8rem; letter-spacing: 1px;">
-            DESCARGAR RECIBO (PDF)
-        </button>
-    </div>
+        <script>
+            async function cargarTicket() {
+                // Capturar el id de la URL 
+                const urlParams = new URLSearchParams(window.location.search);
+                const idPedido = urlParams.get('id');
 
-    <script>
-        // Generar datos ficticios pero realistas para el ticket
-        const orderId = 'BC-' + Math.floor(Math.random() * 89999 + 10000);
-        document.getElementById('order-id').innerText = orderId;
-        
-        const hoy = new Date();
-        document.getElementById('fecha-hoy').innerText = hoy.toLocaleDateString() + ' ' + hoy.toLocaleTimeString([], {hour: '2-2-digit', minute:'2-2-digit'});
-    </script>
-</body>
+                if (!idPedido) {
+                    document.getElementById('ticket').innerHTML = "<p>Error al cargar el recibo del pedido.</p>";
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/pedidos/${idPedido}`);
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        const p = result.pedido;
+                        const fecha = new Date(p.fecha_pedido).toLocaleString('es-ES');
+
+                        // Modificamos dinámicamente los campos estáticos antiguos
+                        document.getElementById('order-id').innerText = `#${p.id_pedido}`;
+
+                        // Creamos la estructura del desglose de productos reales comprados
+                        let htmlProductos = '<div style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;">';
+                        let total = 0;
+
+                        result.productos.forEach(prod => {
+                            const subtotal = prod.cantidad * parseFloat(prod.precio_unitario_venta);
+                            total += subtotal;
+                            htmlProductos += `
+                        <p style="margin:5px 0; font-size:0.9rem;">
+                            ${prod.cantidad}x ${prod.nombre_producto} - <strong>${parseFloat(prod.precio_unitario_venta).toFixed(2)}€</strong>
+                        </p>
+                    `;
+                        });
+
+                        htmlProductos += `
+                    <p style="margin-top:15px; font-size:1.1rem; text-align:right;">
+                        <strong>Total: ${total.toFixed(2)}€</strong>
+                    </p>
+                    </div>
+                `;
+
+                        // Inyectamos el desglose y actualizamos los datos de cabecera
+                        const ticketContainer = document.getElementById('ticket');
+                        ticketContainer.innerHTML = `
+                    <h3 style="margin-top:0; border-bottom:1px solid #333; padding-bottom:10px;">RECIBO DE COMPRA</h3>
+                    <p style="margin: 5px 0;"><strong>Nº de Pedido:</strong> #${p.id_pedido}</p>
+                    <p style="margin: 5px 0;"><strong>Cliente:</strong> ${p.cliente}</p>
+                    <p style="margin: 5px 0;"><strong>Fecha:</strong> ${fecha}</p>
+                    <p style="margin: 5px 0;"><strong>Estado Actual:</strong> <span style="color: #c5a059; font-weight:bold; text-transform:uppercase;">${p.estado.replace('_', ' ')}</span></p>
+                    <p style="margin: 5px 0;"><strong>Método:</strong> Recogida en Obrador Baker & Co.</p>
+                    ${htmlProductos}
+                    <div style="border-top: 1px dashed #ccc; margin: 20px 0; padding-top: 20px; text-align:center;">
+                        <p style="font-size: 0.8rem; color: #666; font-style: italic;">"Gracias por elegir la repostería artesanal de calidad."</p>
+                    </div>
+                `;
+                    } else {
+                        alert("No se pudo recuperar la información del pedido.");
+                    }
+                } catch (error) {
+                    console.error("Error al renderizar el ticket:", error);
+                }
+            }
+
+            window.onload = cargarTicket;
+        </script>
+    </body>
 </html>
