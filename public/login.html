@@ -48,7 +48,7 @@
                         // Guardamos el objeto de usuario 
                         localStorage.setItem('user', JSON.stringify(result.user));
                         
-                        // FLUJO DE REDIRECCIÓN CORREGIDO:
+                        // FLUJO DE REDIRECCIÓN:
                         // Si el rol devuelto por el backend es estrictamente 'empleado', va a la interfaz de cocina.
                         // Si es 'admin', 'VIP' o 'estandar', entra directamente a la tienda (index.html).
                         if (result.user.rol === 'empleado') {
