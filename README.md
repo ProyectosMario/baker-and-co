@@ -123,6 +123,7 @@ BakerCoEnterprise/
 ├── controllers/          # Lógica de control (MVC)
 │   ├── authController.js
 │   ├── ingredientController.js
+│   ├── orderController.js
 │   └── productController.js
 ├── middlewares/          # Funciones intermedias (seguridad)
 ├── node_modules/         # (Ignorado en Git) Librerías Node.js
@@ -132,6 +133,7 @@ BakerCoEnterprise/
 │   ├── checkout.html
 │   ├── confirmacion.html
 │   ├── detalle.html
+│   ├── empleado.html
 │   ├── index.html
 │   ├── login.html
 │   ├── registro.html
@@ -139,6 +141,7 @@ BakerCoEnterprise/
 ├── routes/               # Rutas de la API
 │   ├── authRoutes.js
 │   ├── ingredientRoutes.js
+│   ├── orderRoutes.js
 │   └── productRoutes.js
 ├── .env                  # (Ignorado en Git) Variables de entorno
 ├── package-lock.json
