@@ -29,24 +29,28 @@
             document.getElementById('loginForm').onsubmit = async (e) => {
                 e.preventDefault();
 
-                // 1. Se obtienen los valores de los inputs
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('pass').value;
 
                 try {
-                    // 2. Se hace la llamada al servidor
                     const response = await fetch('/api/auth/login', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({email: email, password: password})
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
                     });
 
                     const result = await response.json();
 
                     if (result.status === 'success') {
+                        // Guardamos el objeto de usuario 
                         localStorage.setItem('user', JSON.stringify(result.user));
-
-                        // Redirección inteligente según el rol que devuelve la BBDD
+                        
+                        // FLUJO DE REDIRECCIÓN CORREGIDO:
+                        // Si el rol devuelto por el backend es estrictamente 'empleado', va a la interfaz de cocina.
+                        // Si es 'admin', 'VIP' o 'estandar', entra directamente a la tienda (index.html).
                         if (result.user.rol === 'empleado') {
                             window.location.href = 'empleado.html';
                         } else {
