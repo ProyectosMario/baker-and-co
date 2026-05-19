@@ -6,13 +6,51 @@
         <link rel="stylesheet" href="css/style.css">
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
         <style>
-            .step-hidden { display: none; }
-            .form-control { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-            .active-step { color: black !important; font-weight: bold; border-bottom: 2px solid #c5a059; }
-            .summary-item { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; border-bottom: 1px solid #f9f9f9; padding-bottom: 10px; }
-            .summary-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; }
-            .btn-black:disabled { background: #666; cursor: not-allowed; }
-            .btn-eliminar { background: none; border: none; color: #d9534f; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; padding: 0; margin-top: 5px; font-weight: 600; }
+            .step-hidden {
+                display: none;
+            }
+            .form-control {
+                width: 100%;
+                padding: 12px;
+                margin: 8px 0;
+                border: 1px solid #ddd;
+                box-sizing: border-box;
+                font-family: 'Montserrat', sans-serif;
+            }
+            .active-step {
+                color: black !important;
+                font-weight: bold;
+                border-bottom: 2px solid #c5a059;
+            }
+            .summary-item {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+                align-items: center;
+                border-bottom: 1px solid #f9f9f9;
+                padding-bottom: 10px;
+            }
+            .summary-item img {
+                width: 70px;
+                height: 70px;
+                object-fit: cover;
+                border-radius: 4px;
+            }
+            .btn-black:disabled {
+                background: #666;
+                cursor: not-allowed;
+            }
+            .btn-eliminar {
+                background: none;
+                border: none;
+                color: #d9534f;
+                cursor: pointer;
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                padding: 0;
+                margin-top: 5px;
+                font-weight: 600;
+            }
         </style>
     </head>
     <body>
@@ -84,11 +122,13 @@
                     list.innerHTML = `<div style="text-align:center; padding:40px; border: 1px dashed #ccc;"><p>Tu carrito está vacío.</p><a href="index.html" style="color: black; font-weight: bold; text-decoration: underline;">Volver a la tienda</a></div>`;
                     side.innerHTML = "<p style='font-size:0.8rem; color:#999;'>No hay productos en la cesta.</p>";
                     totalPriceElement.innerText = "0.00€";
-                    if (btnContinuar) btnContinuar.style.display = 'none';
+                    if (btnContinuar)
+                        btnContinuar.style.display = 'none';
                     return;
                 }
 
-                if (btnContinuar) btnContinuar.style.display = 'block';
+                if (btnContinuar)
+                    btnContinuar.style.display = 'block';
 
                 let htmlContent = "";
                 let total = 0;
@@ -143,23 +183,63 @@
 
             async function finalizarCompra() {
                 let carritoFinal = JSON.parse(localStorage.getItem('carrito')) || [];
+                let userData = JSON.parse(localStorage.getItem('user'));
+
+                if (!userData) {
+                    alert("⚠️ Debes iniciar sesión para completar tu pedido.");
+                    window.location.href = 'login.html';
+                    return;
+                }
+
                 if (carritoFinal.length === 0) {
                     alert("⚠️ El carrito está vacío.");
                     window.location.href = 'index.html';
                     return;
                 }
+
                 const tarjeta = document.getElementById('tarjeta-num').value.trim();
                 if (tarjeta.length < 16) {
                     alert("⚠️ Por favor, introduce un número de tarjeta válido.");
                     return;
                 }
+
+                // Adaptación a detalles_pedido congelando precios 
+                const productosPayload = carritoFinal.map(item => ({
+                        id_producto: parseInt(item.id),
+                        cantidad: 1,
+                        precio_unitario_venta: parseFloat(item.precio)
+                    }));
+
                 const btn = document.getElementById('btn-pagar');
-                btn.innerText = "PROCESANDO PAGO...";
+                btn.innerText = "PROCESANDO COMPRA REAL EN EL OBRADOR...";
                 btn.disabled = true;
-                setTimeout(() => {
-                    localStorage.removeItem('carrito');
-                    window.location.href = 'confirmacion.html';
-                }, 2000);
+
+                try {
+                    const response = await fetch('/api/pedidos/crear', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            id_usuario: userData.id,
+                            productos: productosPayload
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        localStorage.removeItem('carrito');
+                        // Mandamos el ID real generado en la BBDD a la pantalla de confirmación
+                        window.location.href = `confirmacion.html?id=${result.id_pedido}`;
+                    } else {
+                        alert("Error del obrador: " + result.message);
+                        btn.innerText = "PAGAR Y FINALIZAR PEDIDO";
+                        btn.disabled = false;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Error de red al conectar con el servidor.");
+                    btn.disabled = false;
+                }
             }
 
             document.addEventListener('DOMContentLoaded', renderCheckout);
