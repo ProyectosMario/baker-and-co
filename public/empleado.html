@@ -3,111 +3,75 @@
     <head>
         <meta charset="UTF-8">
         <title>Panel de Obrador | Baker & Co.</title>
+        <link rel="stylesheet" href="css/styles.css">
         <style>
-            :root {
-                --gold: #c5a059;
-                --dark: #333;
-                --light-bg: #fcfaf7;
-            }
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                margin: 0;
-                background: var(--light-bg);
-                color: var(--dark);
-            }
-            header {
-                background: white;
-                padding: 20px 50px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1px solid #e0e0e0;
-            }
-            .logo {
-                font-weight: bold;
-                letter-spacing: 2px;
-                cursor: pointer;
-                font-size: 1.2rem;
-            }
             .panel-container {
-                max-width: 1200px;
-                margin: 40px auto;
-                padding: 30px;
+                max-width: 1100px;
+                margin: 50px auto;
+                padding: 40px;
                 background: white;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
+                border: 1px solid var(--border-light);
             }
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-top: 20px;
+                margin-top: 30px;
             }
             th, td {
-                padding: 14px;
+                padding: 15px;
                 text-align: left;
-                border-bottom: 1px solid #eee;
+                border-bottom: 1px solid var(--border-light);
                 font-size: 0.9rem;
             }
             th {
-                background-color: #fcfaf7;
+                background-color: var(--bg-soft);
                 text-transform: uppercase;
-                font-size: 0.8rem;
-                letter-spacing: 1px;
-            }
-            .status-badge {
-                padding: 6px 12px;
                 font-size: 0.75rem;
-                font-weight: bold;
-                text-transform: uppercase;
-                border-radius: 20px;
-                display: inline-block;
-            }
-            .recibido {
-                background: #e1f5fe;
-                color: #0288d1;
-            }
-            .en_preparacion {
-                background: #fff3e0;
-                color: #f57c00;
-            }
-            .listo {
-                background: #e8f5e9;
-                color: #388e3c;
-            }
-            .entregado {
-                background: #efebe9;
-                color: #5d4037;
+                letter-spacing: 1px;
             }
             .btn-status {
                 padding: 6px 12px;
                 font-size: 0.75rem;
-                border: 1px solid #333;
+                border: 1px solid var(--black);
                 background: white;
-                color: #333;
+                color: var(--black);
                 cursor: pointer;
-                font-weight: bold;
-                margin-right: 4px;
-                border-radius: 4px;
+                font-weight: 600;
+                margin-right: 5px;
                 transition: 0.2s;
             }
             .btn-status:hover {
-                background: #333;
+                background: var(--black);
                 color: white;
+            }
+            .btn-nav-back {
+                background: none;
+                border: 1px solid var(--black);
+                padding: 8px 15px;
+                font-weight: 600;
+                font-size: 0.8rem;
+                cursor: pointer;
+                margin-right: 20px;
+                transition: 0.3s;
+            }
+            .btn-nav-back:hover {
+                background: var(--bg-soft);
             }
         </style>
     </head>
     <body>
         <header>
-            <div class="logo" onclick="window.location.href = 'index.html'">BAKER & CO. - INTERFAZ DE TRABAJO</div>
-            <div>
-                <span id="emp-name" style="font-weight: bold; margin-right: 20px;"></span>
-                <button onclick="localStorage.clear(); window.location.href = 'login.html';" style="background:none; border:1px solid #333; padding: 5px 10px; cursor:pointer;">Cerrar Sesión</button>
-            </div>
+            <div class="logo" onclick="window.location.href = 'index.html'" style="cursor:pointer;">BAKER & CO. - OBRADOR</div>
+            <nav style="display: flex; align-items: center;">
+                <button class="btn-nav-back" onclick="window.location.href = 'index.html'">← VOLVER A LA TIENDA</button>
+                <span id="emp-name" style="font-weight: 600; margin-right: 20px;"></span>
+                <button id="btn-logout" onclick="logout()" style="background:none; border:none; cursor:pointer;">SALIR</button>
+            </nav>
         </header>
 
         <main class="panel-container">
-            <h2>Control de Producción y Comandas</h2>
-            <p style="color: #777;">Actualiza el estado de las elaboraciones en tiempo real para mantener informados a los clientes.</p>
+            <h2>Panel de Producción e Interfaz de Trabajo</h2>
+            <p style="color: #666; font-size: 0.9rem;">Visualiza y actualiza las comandas activas asignadas a la cocina.</p>
 
             <table>
                 <thead>
@@ -115,76 +79,40 @@
                         <th>Nº Pedido</th>
                         <th>Cliente</th>
                         <th>Fecha Comanda</th>
-                        <th>Estado de Elaboración</th>
-                        <th>Pastelero</th>
-                        <th>Gestión de Estado</th>
+                        <th>Estado</th>
+                        <th>Acciones de Control</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-pedidos">
+                    <tr>
+                        <td><strong>#1024</strong></td>
+                        <td>Carlos Mendoza</td>
+                        <td>19/05/2026, 14:32</td>
+                        <td style="color: var(--gold); font-weight: bold;">En preparación</td>
+                        <td>
+                            <button class="btn-status" onclick="alert('Estado cambiado a Listo')">Marcar Listo</button>
+                            <button class="btn-status" onclick="alert('Pedido Entregado')">Entregar</button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </main>
 
         <script>
+            // Control de acceso al panel
             const user = JSON.parse(localStorage.getItem('user'));
 
             if (!user || (user.rol !== 'empleado' && user.rol !== 'admin')) {
-                alert("Acceso exclusivo para personal del obrador.");
+                alert("Acceso denegado. Área exclusiva para personal autorizado.");
                 window.location.href = 'login.html';
             } else {
-                document.getElementById('emp-name').innerText = `${user.nombre} [${user.rol.toUpperCase()}]`;
+                document.getElementById('emp-name').innerText = `${user.nombre_completo} [${user.rol.toUpperCase()}]`;
             }
 
-            async function cargarPedidos() {
-                try {
-                    const res = await fetch('/api/pedidos');
-                    const result = await res.json();
-                    const tbody = document.getElementById('tabla-pedidos');
-                    tbody.innerHTML = '';
-
-                    if (result.status === 'success') {
-                        result.data.forEach(p => {
-                            const fecha = new Date(p.fecha_pedido).toLocaleString('es-ES');
-                            tbody.innerHTML += `
-                                <tr>
-                                    <td><strong>#${p.id_pedido}</strong></td>
-                                    <td>${p.cliente}</td>
-                                    <td>${fecha}</td>
-                                    <td><span class="status-badge ${p.estado}">${p.estado.replace('_', ' ')}</span></td>
-                                    <td>${p.empleado || '<i>Sin asignar</i>'}</td>
-                                    <td>
-                                        <button class="btn-status" onclick="cambiarEstado(${p.id_pedido}, 'en_preparacion')">Meter al Horno</button>
-                                        <button class="btn-status" onclick="cambiarEstado(${p.id_pedido}, 'listo')">Marcar Listo</button>
-                                        <button class="btn-status" onclick="cambiarEstado(${p.id_pedido}, 'entregado')">Entregar</button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error al cargar pedidos:", error);
-                }
+            function logout() {
+                localStorage.clear();
+                window.location.href = 'login.html';
             }
-
-            async function cambiarEstado(idPedido, nuevoEstado) {
-                try {
-                    const res = await fetch('/api/pedidos/actualizar-estado', {
-                        method: 'PUT',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({id_pedido: idPedido, nuevo_estado: nuevoEstado})
-                    });
-                    const result = await res.json();
-                    if (result.status === 'success') {
-                        cargarPedidos();
-                    } else {
-                        alert(result.message);
-                    }
-                } catch (error) {
-                    alert("Error de comunicación con el servidor.");
-                }
-            }
-
-            cargarPedidos();
         </script>
     </body>
 </html>
