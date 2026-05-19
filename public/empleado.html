@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Panel de Obrador | Baker & Co.</title>
+        <style>
+            :root {
+                --gold: #c5a059;
+                --dark: #333;
+                --light-bg: #fcfaf7;
+            }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                background: var(--light-bg);
+                color: var(--dark);
+            }
+            header {
+                background: white;
+                padding: 20px 50px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            .logo {
+                font-weight: bold;
+                letter-spacing: 2px;
+                cursor: pointer;
+                font-size: 1.2rem;
+            }
+            .panel-container {
+                max-width: 1200px;
+                margin: 40px auto;
+                padding: 30px;
+                background: white;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th, td {
+                padding: 14px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+                font-size: 0.9rem;
+            }
+            th {
+                background-color: #fcfaf7;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 1px;
+            }
+            .status-badge {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                border-radius: 20px;
+                display: inline-block;
+            }
+            .recibido {
+                background: #e1f5fe;
+                color: #0288d1;
+            }
+            .en_preparacion {
+                background: #fff3e0;
+                color: #f57c00;
+            }
+            .listo {
+                background: #e8f5e9;
+                color: #388e3c;
+            }
+            .entregado {
+                background: #efebe9;
+                color: #5d4037;
+            }
+            .btn-status {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+                border: 1px solid #333;
+                background: white;
+                color: #333;
+                cursor: pointer;
+                font-weight: bold;
+                margin-right: 4px;
+                border-radius: 4px;
+                transition: 0.2s;
+            }
+            .btn-status:hover {
+                background: #333;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo" onclick="window.location.href = 'index.html'">BAKER & CO. - INTERFAZ DE TRABAJO</div>
+            <div>
+                <span id="emp-name" style="font-weight: bold; margin-right: 20px;"></span>
+                <button onclick="localStorage.clear(); window.location.href = 'login.html';" style="background:none; border:1px solid #333; padding: 5px 10px; cursor:pointer;">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <main class="panel-container">
+            <h2>Control de Producción y Comandas</h2>
+            <p style="color: #777;">Actualiza el estado de las elaboraciones en tiempo real para mantener informados a los clientes.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nº Pedido</th>
+                        <th>Cliente</th>
+                        <th>Fecha Comanda</th>
+                        <th>Estado de Elaboración</th>
+                        <th>Pastelero</th>
+                        <th>Gestión de Estado (Flujo RF12)</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-pedidos">
+                </tbody>
+            </table>
+        </main>
+
+        <script>
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (!user || (user.rol !== 'empleado' && user.rol !== 'admin')) {
+                alert("Acceso exclusivo para personal del obrador.");
+                window.location.href = 'login.html';
+            } else {
+                document.getElementById('emp-name').innerText = `${user.nombre} [${user.rol.toUpperCase()}]`;
+            }
+
+            async function cargarPedidos() {
+                try {
+                    const res = await fetch('/api/pedidos');
+                    const result = await res.json();
+                    const tbody = document.getElementById('tabla-pedidos');
+                    tbody.innerHTML = '';
+
+                    if (result.status === 'success') {
+                        result.data.forEach(p => {
+                            const fecha = new Date(p.fecha_pedido).toLocaleString('es-ES');
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td><strong>#${p.id_pedido}</strong></td>
+                                    <td>${p.cliente}</td>
+                                    <td>${fecha}</td>
+                                    <td><span class="status-badge ${p.estado}">${p.estado.replace('_', ' ')}</span></td>
+                                    <td>${p.empleado || '<i>Sin asignar</i>'}</td>
+                                    <td>
+                                        <button class="btn-status" onclick="cambiarEstado(${p.id_pedido}, 'en_preparacion')">Meter al Horno</button>
+                                        <button class="btn-status" onclick="cambiarEstado(${p.id_pedido}, 'listo')">Marcar Listo</button>
+                                        <button class="btn-status" onclick="cambiarEstado(${p.id_pedido}, 'entregado')">Entregar</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error al cargar pedidos:", error);
+                }
+            }
+
+            async function cambiarEstado(idPedido, nuevoEstado) {
+                try {
+                    const res = await fetch('/api/pedidos/actualizar-estado', {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({id_pedido: idPedido, nuevo_estado: nuevoEstado})
+                    });
+                    const result = await res.json();
+                    if (result.status === 'success') {
+                        cargarPedidos();
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    alert("Error de comunicación con el servidor.");
+                }
+            }
+
+            cargarPedidos();
+        </script>
+    </body>
+</html>
